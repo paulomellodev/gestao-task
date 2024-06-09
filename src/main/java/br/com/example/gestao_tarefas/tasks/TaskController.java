@@ -1,7 +1,7 @@
 package br.com.example.gestao_tarefas.tasks;
 
 import br.com.example.gestao_tarefas.tasks.dtos.TaskCreateDTO;
-import br.com.example.gestao_tarefas.tasks.enums.TasksStatusEnum;
+import br.com.example.gestao_tarefas.tasks.dtos.TaskUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,8 +36,10 @@ public class TaskController {
     
     @GetMapping
     public ResponseEntity<List<TaskEntity>> listAllTasks(
-        @RequestParam Optional<String> title, @RequestParam Optional<TasksStatusEnum> status) {
-        final List<TaskEntity> allTasks = taskService.listAll(status);
+            @RequestParam Optional<String> title,
+            @RequestParam Optional<String> status) {
+        final List<TaskEntity> allTasks = taskService.listAll(status, title);
+        System.out.println(status);
         return new ResponseEntity<List<TaskEntity>>(allTasks, HttpStatus.OK);
     }
 
@@ -49,10 +51,8 @@ public class TaskController {
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskEntity> updateTask(
         @PathVariable UUID taskId,
-        @RequestBody TaskCreateDTO taskUpdateDto) {
-        //TODO: process PUT request
-        
-        return taskUpdateDto;
+        @Valid @RequestBody TaskUpdateDTO taskUpdateDto) {
+        return new ResponseEntity<>(taskService.updateTask(taskId, taskUpdateDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/{taskId}")

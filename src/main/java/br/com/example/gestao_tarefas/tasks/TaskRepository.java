@@ -7,18 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
-
-import br.com.example.gestao_tarefas.tasks.enums.TasksStatusEnum;
-
 
 public interface TaskRepository extends JpaRepository<TaskEntity, UUID> {
 
-    List<TaskEntity> findByStatus(Optional<TasksStatusEnum> taskStatus);
-    List<TaskEntity> findByTitle(String title);
-
-    @Query(value = "SELECT * FROM tasks WHERE 1=1 AND title LIKE %:title% AND status = :taskStatus", nativeQuery=true)
-    List<TaskEntity> filterTasks(
-        @Param("taskStatus") Optional<TasksStatusEnum> taskStatus,
-        @Param("title") Optional<String> title);
+    @Query("SELECT t FROM tasks t WHERE " +
+           "(:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+           "(:status IS NULL OR UPPER(:status) = t.status)")
+    List<TaskEntity> findByTitleStatus(
+        @Param("status") String status,
+        @Param("title") String title);
 }

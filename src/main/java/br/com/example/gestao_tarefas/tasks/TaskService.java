@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import br.com.example.gestao_tarefas.exceptions.customExceptions.NotFoundException;
 import br.com.example.gestao_tarefas.tasks.dtos.TaskCreateDTO;
+import br.com.example.gestao_tarefas.tasks.dtos.TaskUpdateDTO;
 import br.com.example.gestao_tarefas.tasks.enums.TasksStatusEnum;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TaskService {
     private final TaskRepository taskRepository;
 
+    @Transactional
     public TaskEntity create(TaskCreateDTO taskData){
         if(taskData.getStatus() == null){
             taskData.setStatus(TasksStatusEnum.DRAFT);
@@ -25,19 +28,30 @@ public class TaskService {
         return newTask;
     }
 
-    public List<TaskEntity> listAll(Optional<TasksStatusEnum> taskStatus){
-        if(taskStatus.isPresent()){
-            return taskRepository.findByStatus(taskStatus);
-        }
-        return taskRepository.findAll();
+    public List<TaskEntity> listAll(Optional<String> status, Optional<String> title){
+        System.out.println(status);
+        return taskRepository.findByTitleStatus(status.orElse(null), title.orElse(null));
     }
 
     public TaskEntity findById(UUID id) {
         return taskRepository.findById(id).orElseThrow(() -> new NotFoundException());
     }
 
-    public TaskEntity updateTask(UUID taskId, TaskCreateDTO taskData){
+    @Transactional
+    public TaskEntity updateTask(UUID taskId, TaskUpdateDTO taskData){
+        TaskEntity task = findById(taskId);
         
+        if(taskData.getTitle() != null){
+            task.setTitle(taskData.getTitle());
+        }
+        if(taskData.getStatus() != null){
+            task.setStatus(taskData.getStatus());
+        }
+        if(taskData.getDescription() != null){
+            task.setDescription(taskData.getDescription());
+        }
+
+        return taskRepository.save(task);
     }
 
     public void deleteTaskById(UUID taskId) {
