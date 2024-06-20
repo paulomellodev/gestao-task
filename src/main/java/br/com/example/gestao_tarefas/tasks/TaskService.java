@@ -29,7 +29,6 @@ public class TaskService {
     }
 
     public List<TaskEntity> listAll(Optional<String> status, Optional<String> title){
-        System.out.println(status);
         return taskRepository.findByTitleStatus(status.orElse(null), title.orElse(null));
     }
 
