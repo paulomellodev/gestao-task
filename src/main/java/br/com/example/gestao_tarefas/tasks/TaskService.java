@@ -10,6 +10,7 @@ import br.com.example.gestao_tarefas.exceptions.customExceptions.NotFoundExcepti
 import br.com.example.gestao_tarefas.tasks.dtos.TaskCreateDTO;
 import br.com.example.gestao_tarefas.tasks.dtos.TaskUpdateDTO;
 import br.com.example.gestao_tarefas.tasks.enums.TasksStatusEnum;
+import br.com.example.gestao_tarefas.users.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -19,11 +20,12 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     @Transactional
-    public TaskEntity create(TaskCreateDTO taskData){
+    public TaskEntity create(TaskCreateDTO taskData, UserEntity user){
         if(taskData.getStatus() == null){
             taskData.setStatus(TasksStatusEnum.DRAFT);
         }
-        final TaskEntity newTask = new TaskEntity(taskData.getTitle(), taskData.getStatus(), taskData.getDescription());
+
+        final TaskEntity newTask = new TaskEntity(taskData.getTitle(), taskData.getStatus(), taskData.getDescription(), user);
         taskRepository.save(newTask);
         return newTask;
     }

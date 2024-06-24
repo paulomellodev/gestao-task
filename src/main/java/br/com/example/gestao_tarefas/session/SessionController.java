@@ -43,6 +43,8 @@ public class SessionController {
 
         var userBuilder = UserEntity.builder()
                                     .username(payload.getUsername())
+                                    .name(payload.getName())
+                                    .email(payload.getEmail())
                                     .password(encoder.encode(payload.getPassword()));
         
         if(payload.getAdmin()){
@@ -73,8 +75,5 @@ public class SessionController {
         msg.put("token", token);
 
         return ResponseEntity.status(200).body(msg);
-
     }
-    
-    
 }

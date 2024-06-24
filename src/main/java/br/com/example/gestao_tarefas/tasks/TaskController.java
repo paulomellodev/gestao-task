@@ -2,6 +2,8 @@ package br.com.example.gestao_tarefas.tasks;
 
 import br.com.example.gestao_tarefas.tasks.dtos.TaskCreateDTO;
 import br.com.example.gestao_tarefas.tasks.dtos.TaskUpdateDTO;
+import br.com.example.gestao_tarefas.users.UserEntity;
+import br.com.example.gestao_tarefas.users.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -11,6 +13,10 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +33,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
+    private final UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<TaskEntity> createTask(@Valid @RequestBody TaskCreateDTO taskData) {
-        TaskEntity newTask = taskService.create(taskData);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        System.out.println(userDetails);
+        UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(()-> {
+            String error = String.format("Username %s not found", userDetails.getUsername());
+            return new UsernameNotFoundException(error);
+        });
+                
+        TaskEntity newTask = taskService.create(taskData, user);
         return new ResponseEntity<TaskEntity>(newTask, HttpStatus.CREATED);
     }
     
@@ -39,7 +54,6 @@ public class TaskController {
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> status) {
         final List<TaskEntity> allTasks = taskService.listAll(status, title);
-        System.out.println(status);
         return new ResponseEntity<List<TaskEntity>>(allTasks, HttpStatus.OK);
     }
 
