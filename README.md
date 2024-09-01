@@ -8,8 +8,6 @@ Back-end de um sistema para gestão de tarefas realizado com o intuito de pratic
 
 </br>
 ​
----
-​
 ## Tecnologias:
 ​
 - Linguagem:
