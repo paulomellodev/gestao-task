@@ -8,7 +8,9 @@ Back-end de um sistema para gestão de tarefas realizado com o intuito de pratic
 
 </br>
 ​
+
 ## Tecnologias:
+
 ​
 - Linguagem:
   - Java 17
@@ -20,11 +22,13 @@ Back-end de um sistema para gestão de tarefas realizado com o intuito de pratic
   - Spring Security
 ​
 <br>
+
+
 ## Instalação
 
 </br>
 
-- Rode, e teste as rotas**
+- **Rode, e teste as rotas**
 
 ## Endpoints User (Tabela "users")
 
